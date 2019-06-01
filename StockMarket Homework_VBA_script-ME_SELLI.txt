@@ -1,0 +1,117 @@
+Sub totalvolume()
+
+For Each ws In Worksheets
+
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Total Stock Volume"
+
+
+Dim counter As Integer
+Dim volume As Double
+
+
+volume = ws.Cells(2, 7).Value
+counter = 2
+
+For i = 2 To ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+If ws.Cells(i, 1).Value = ws.Cells(i + 1, 1).Value Then
+volume = volume + ws.Cells(i + 1, 7).Value
+ElseIf ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+ws.Cells(counter, 10).Value = volume
+ws.Cells(counter, 9).Value = ws.Cells(i, 1).Value
+volume = ws.Cells(i, 7).Value
+counter = counter + 1
+
+End If
+
+Next i
+
+ws.Range("J1").EntireColumn.Insert
+ws.Range("K1").EntireColumn.Insert
+
+ws.Range("J1").Value = "Yearly Change"
+ws.Range("K1").Value = "Percent Change"
+
+Dim counter2 As Integer
+
+ws.Range("K2").EntireColumn.NumberFormat = "0.00%"
+
+counter = 2
+counter2 = 0
+
+For i = 2 To ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+If ws.Cells(i, 1).Value = ws.Cells(i + 1, 1).Value Then
+counter2 = counter2 + 1
+ElseIf ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+ws.Cells(counter, 10).Value = ws.Cells(i, 6).Value - ws.Cells(i - counter2, 3)
+If ws.Cells(counter, 10).Value < 0 Then
+ws.Cells(counter, 10).Interior.ColorIndex = 3
+Else
+ws.Cells(counter, 10).Interior.ColorIndex = 4
+End If
+If ws.Cells(i - counter2, 3) = 0 Then
+ws.Cells(counter, 11).Value = Null
+Else
+ws.Cells(counter, 11).Value = ws.Cells(counter, 10) / ws.Cells(i - counter2, 3)
+End If
+counter2 = 0
+counter = counter + 1
+
+End If
+
+Next i
+
+Dim grtsinc As Double
+Dim grtsdic As Double
+Dim grtsincname As String
+Dim grtsdicname As String
+
+grtsinc = 0
+grtsdic = 0
+
+For i = 2 To ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+If ws.Cells(i, 11).Value > grtsinc Then
+grtsinc = ws.Cells(i, 11).Value
+grtsincname = ws.Cells(i, 9).Value
+ElseIf ws.Cells(i, 11).Value < grtsdic Then
+grtsdic = ws.Cells(i, 11).Value
+grtsdicname = ws.Cells(i, 9).Value
+
+End If
+Next i
+
+Dim grtsvol As Double
+Dim grtsvolname As String
+
+grtsvol = 0
+
+For i = 2 To ws.Cells(Rows.Count, 1).End(xlUp).Row
+If ws.Cells(i, 12).Value > grtsvol Then
+grtsvol = ws.Cells(i, 12).Value
+grtsvolname = ws.Cells(i, 9).Value
+End If
+
+Next i
+
+ws.Range("Q2, Q3").NumberFormat = "0.00%"
+
+ws.Cells(2, 17).Value = grtsinc
+ws.Cells(2, 16).Value = grtsincname
+ws.Cells(3, 17).Value = grtsdic
+ws.Cells(3, 16).Value = grtsdicname
+ws.Cells(4, 17).Value = grtsvol
+ws.Cells(4, 16).Value = grtsvolname
+ws.Cells(2, 15).Value = "Greatest % Increase"
+ws.Cells(3, 15).Value = "Greatest % Decrease"
+ws.Cells(4, 15).Value = "Greatest Total Volume"
+ws.Cells(1, 16).Value = "Ticker"
+ws.Cells(1, 17).Value = "Value"
+
+ws.Cells(4, 17).NumberFormat = "0"
+
+Next ws
+
+End Sub
